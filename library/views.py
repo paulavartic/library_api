@@ -1,10 +1,11 @@
+from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      ListAPIView, RetrieveAPIView,
                                      UpdateAPIView)
 
 from library.models import Author, Book, BookIssue
-from library.serializers import AuthorSerializer, BookSerializer, BookIssueSerializer
+from library.serializers import AuthorSerializer, BookSerializer, BookIssueSerializer, BookDetailSerializer
 
 
 class AuthorListAPIView(ListAPIView):
@@ -30,6 +31,10 @@ class AuthorDestroyAPIView(DestroyAPIView):
 class BookViewSet(ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    filterset_fields = ('author', 'genre', 'available',)
+    ordering_fields = ('title', 'author',)
+    search_fields = ('title', 'author', 'genre')
 
 
 class BookCreateAPIView(CreateAPIView):
@@ -39,7 +44,7 @@ class BookCreateAPIView(CreateAPIView):
 
 class BookRetrieveAPIView(RetrieveAPIView):
     queryset = Book.objects.all()
-    serializer_class = BookSerializer
+    serializer_class = BookDetailSerializer
 
 
 class BookUpdateAPIView(UpdateAPIView):
@@ -60,4 +65,3 @@ class BookIssueListAPIView(ListAPIView):
 class BookIssueCreateAPIView(CreateAPIView):
     queryset = BookIssue.objects.all()
     serializer_class = BookIssueSerializer
-
