@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from library.models import Author, Book, BookIssue
+from library.validators import ReturnValidator
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -15,7 +16,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
-    author = AuthorSerializer
+    author = AuthorSerializer(read_only=True)
 
     class Meta:
         model = Book
@@ -35,6 +36,8 @@ class BookDetailSerializer(serializers.ModelSerializer):
 
 
 class BookIssueSerializer(serializers.ModelSerializer):
+    return_date = serializers.DateField(validators=[ReturnValidator])
+
     class Meta:
         model = BookIssue
         fields = '__all__'

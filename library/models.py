@@ -1,3 +1,5 @@
+from datetime import timedelta, date
+
 from django.db import models
 
 from users.models import NULLABLE, User
@@ -75,7 +77,7 @@ class BookIssue(models.Model):
     )
     return_date = models.DateField(
         verbose_name='Return date',
-        **NULLABLE,
+        default=(date.today() + timedelta(days=15))
     )
 
     class Meta:
