@@ -1,5 +1,3 @@
-from datetime import timedelta, date
-
 from django.db import models
 
 from users.models import NULLABLE, User
@@ -42,6 +40,7 @@ class Book(models.Model):
         verbose_name='Genre',
         help_text='Enter the genre of the book',
         max_length=150,
+        **NULLABLE
     )
     publication_date = models.DateField(
         verbose_name='Date of publication',
@@ -61,6 +60,7 @@ class Book(models.Model):
 
 
 class BookIssue(models.Model):
+
     book = models.ForeignKey(
         Book,
         on_delete=models.CASCADE,
@@ -77,7 +77,7 @@ class BookIssue(models.Model):
     )
     return_date = models.DateField(
         verbose_name='Return date',
-        default=(date.today() + timedelta(days=15))
+        **NULLABLE
     )
 
     class Meta:

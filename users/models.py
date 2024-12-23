@@ -41,3 +41,31 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
+
+class Donation(models.Model):
+    amount = models.PositiveIntegerField(
+        verbose_name='Amount',
+    )
+    session_id = models.CharField(
+        max_length=255,
+        verbose_name='Session ID',
+        **NULLABLE
+    )
+    link = models.URLField(
+        max_length=400,
+        verbose_name='Payment URL',
+        **NULLABLE
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        verbose_name='User',
+        **NULLABLE
+    )
+
+    class Meta:
+        verbose_name = 'Donation'
+        verbose_name_plural = 'Donations'
+
+    def __str__(self):
+        return self.amount

@@ -6,7 +6,9 @@ from rest_framework.generics import (CreateAPIView, DestroyAPIView,
                                      UpdateAPIView)
 
 from library.models import Author, Book, BookIssue
+from library.paginators import MyPageNumberPagination
 from library.serializers import AuthorSerializer, BookSerializer, BookIssueSerializer, BookDetailSerializer
+from library.task import send_confirmation
 from users.permissions import IsAdmin, IsOwner
 
 
@@ -14,6 +16,7 @@ class AuthorListAPIView(ListAPIView):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
     permission_classes = (AllowAny,)
+    pagination_class = MyPageNumberPagination
 
 
 class AuthorCreateAPIView(CreateAPIView):
@@ -45,6 +48,7 @@ class BookViewSet(ModelViewSet):
     filterset_fields = ('author', 'genre', 'available',)
     ordering_fields = ('title', 'author',)
     search_fields = ('title', 'author', 'genre')
+    pagination_class = MyPageNumberPagination
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
@@ -66,7 +70,10 @@ class BookViewSet(ModelViewSet):
 class BookIssueListAPIView(ListAPIView):
     queryset = BookIssue.objects.all()
     serializer_class = BookIssueSerializer
+    ordering_fields = ('issue_date',)
+    search_fields = ('user',)
     permission_classes = (IsAuthenticated, IsAdmin | IsOwner,)
+    pagination_class = MyPageNumberPagination
 
 
 class BookIssueCreateAPIView(CreateAPIView):
@@ -78,7 +85,9 @@ class BookIssueCreateAPIView(CreateAPIView):
         book_issue = serializer.save()
         book_issue.book.available = False
         book_issue.user = self.request.user
+        send_confirmation.delay(book_issue.pk)
         book_issue.save()
+
 
 
 class BookIssueRetrieveAPIView(RetrieveAPIView):
